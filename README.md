@@ -1,50 +1,252 @@
-# Welcome to your Expo app 👋
+---
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# 1️⃣ useState
 
-## Get started
+## What it does
+Allows you to add state (data that changes) inside a functional component.
 
-1. Install dependencies
+## Syntax
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```js
+const [state, setState] = useState(initialValue);
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Example
 
-## Learn more
+```js
+import { useState } from "react";
+import { View, Text, Button } from "react-native";
 
-To learn more about developing your project with Expo, look at the following resources:
+export default function Counter() {
+  const [count, setCount] = useState(0);
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+  return (
+    <View>
+      <Text>{count}</Text>
+      <Button title="Increase" onPress={() => setCount(count + 1)} />
+    </View>
+  );
+}
+```
 
-## Join the community
+## Important Notes
 
-Join our community of developers creating universal apps.
+- useState returns an array:
+  - Current value
+  - Function to update it
+- Updating state causes a re-render
+- State updates are asynchronous
+- Never modify state directly
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Wrong:
+```js
+count = count + 1;
+```
+
+Correct:
+```js
+setCount(count + 1);
+```
+
+---
+
+# 2️⃣ useEffect
+
+## What it does
+Handles side effects:
+- API calls
+- Timers
+- Subscriptions
+- Event listeners
+- Console logs
+
+## Syntax
+
+```js
+useEffect(() => {
+  // effect code
+
+  return () => {
+    // cleanup (optional)
+  };
+}, [dependencies]);
+```
+
+---
+
+# 3️⃣ Most Important Patterns
+
+## Run once (on mount)
+
+```js
+useEffect(() => {
+  console.log("Mounted");
+}, []);
+```
+
+## Run when a variable changes
+
+```js
+useEffect(() => {
+  console.log("Count changed");
+}, [count]);
+```
+
+## Cleanup on unmount
+
+```js
+useEffect(() => {
+  const interval = setInterval(() => {
+    console.log("Running...");
+  }, 1000);
+
+  return () => {
+    clearInterval(interval);
+  };
+}, []);
+```
+
+---
+
+# 4️⃣ Component Lifecycle (Hooks Version)
+
+| Class Component        | Hooks Version              |
+|------------------------|---------------------------|
+| componentDidMount      | useEffect(..., [])        |
+| componentDidUpdate     | useEffect(..., [dep])     |
+| componentWillUnmount   | return () => {}           |
+
+---
+
+# 5️⃣ Context API
+
+Used to share global data without passing props manually.
+
+Examples:
+- Auth user
+- Theme
+- Language
+
+---
+
+## Step 1: Create Context
+
+```js
+import { createContext } from "react";
+
+export const AuthContext = createContext();
+```
+
+## Step 2: Create Provider
+
+```js
+import { useState } from "react";
+import { AuthContext } from "./AuthContext";
+
+export default function AuthProvider({ children }) {
+  const [user, setUser] = useState("CheikhTi");
+
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+```
+
+## Step 3: Wrap App
+
+```js
+<AuthProvider>
+  <App />
+</AuthProvider>
+```
+
+## Step 4: Use Context
+
+```js
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
+
+const { user } = useContext(AuthContext);
+```
+
+---
+
+# 6️⃣ Rules of Hooks
+
+Hooks must:
+
+- Be called inside a function component
+- Be called at the top level
+- NOT inside loops
+- NOT inside conditions
+- NOT inside nested functions
+
+Wrong:
+
+```js
+if (something) {
+  useEffect(() => {});
+}
+```
+
+Correct:
+
+```js
+useEffect(() => {
+  if (something) {
+    // logic
+  }
+}, [something]);
+```
+
+---
+
+# 7️⃣ Props vs State vs Context
+
+| Props | State | Context |
+|-------|-------|---------|
+| Passed from parent | Local to component | Global |
+| Read-only | Can change | Shared |
+| Immutable | Mutable via setter | Used with useContext |
+
+---
+
+# 8️⃣ Re-render Rules
+
+Component re-renders when:
+- State changes
+- Props change
+- Context value changes
+
+Does NOT re-render when:
+- Normal variables change
+
+---
+
+# 9️⃣ Quick Exam Answers
+
+When does useEffect run?
+→ After render.
+
+Empty dependency array?
+→ Runs once.
+
+No dependency array?
+→ Runs after every render.
+
+Why cleanup?
+→ Prevent memory leaks.
+
+Why Context?
+→ Avoid prop drilling.
+
+---
+
+# 🔟 Mental Model
+
+useState → Memory  
+useEffect → Side effects after render  
+Context → Global shared state  
+Re-render → React redraws UI#
