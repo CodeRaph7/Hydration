@@ -255,9 +255,6 @@ export default function CombinedApp() {
   );
 }
 
-// ============================================
-// STYLES
-// ============================================
 
 const styles = StyleSheet.create({
   container: {
