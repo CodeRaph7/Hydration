@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import { useColorScheme } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
@@ -20,36 +20,62 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const lightColors = {
-  bg: "#f5f5f5",
-  card: "#ffffff",
+  bg: "#FFFFFF",
+  card: "#F5F5F5",
   text: "#000000",
-  subtitle: "#666666",
+  subtitle: "#333333",
   primary: "#007AFF",
-  border: "#cccccc",
-  placeholder: "#aaaaaa",
+  border: "#DDDDDD",
+  placeholder: "#999999",
 };
 
 const darkColors = {
-  bg: "#1a1a1a",
-  card: "#2a2a2a",
-  text: "#ffffff",
-  subtitle: "#aaaaaa",
+  bg: "#000000",
+  card: "#1a1a1a",
+  text: "#FFFFFF",
+  subtitle: "#CCCCCC",
   primary: "#0A84FF",
-  border: "#444444",
+  border: "#333333",
   placeholder: "#666666",
 };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const colorScheme = useColorScheme();
-  const [theme, setTheme] = useState<Theme>((colorScheme as Theme) || "light");
+  const [theme, setTheme] = useState<Theme>("light");
+  const [isReady, setIsReady] = useState(false);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem("theme");
+        if (savedTheme === "dark" || savedTheme === "light") {
+          setTheme(savedTheme);
+        }
+      } catch (error) {
+        console.error("Failed to load theme:", error);
+      } finally {
+        setIsReady(true);
+      }
+    };
+    loadTheme();
+  }, []);
+
+  const toggleTheme = async () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    try {
+      await AsyncStorage.setItem("theme", newTheme);
+    } catch (error) {
+      console.error("Failed to save theme:", error);
+    }
   };
 
   const colors = theme === "light" ? lightColors : darkColors;
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, colors }}>

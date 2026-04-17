@@ -1,15 +1,30 @@
 {
   "expo": {
-    "name": "tuto",
-    "slug": "tuto",
+    "name": "DaustBlog",
+    "slug": "daustblog",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tuto",
+    "scheme": "daustblog",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "deepLinking": {
+      "enabled": true,
+      "prefixes": [
+        "daustblog://",
+        "https://daustblog.app"
+      ],
+      "config": {
+        "screens": {
+          "details/[id]": "details/:id"
+        }
+      }
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.daustblog.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,9 +33,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.tuto"
+      "package": "com.daustblog.app"
     },
     "web": {
       "output": "static",
@@ -44,6 +57,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ccbbc4f0-9a9e-405b-a103-d098be3cb061"
+      }
     }
   }
 }
